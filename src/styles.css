@@ -1,0 +1,103 @@
+* {
+  box-sizing: border-box;
+}
+
+/* Container */
+
+.app-container {
+  margin: 20px;
+  padding: 10px;
+  border: 2px solid black;
+  border-radius: 10px;
+}
+
+/* People List */
+.people {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.people__item {
+  min-width: 100px;
+  min-height: 220px;
+}
+
+
+/* Person */
+.person {
+  display: block;
+  position: relative;
+  width: 100px;
+  cursor: pointer;
+}
+
+.person img {
+  width: 100%;
+}
+
+.person input {
+  position: absolute;
+  width: 100%;
+  top: 37%;
+  left: 0;
+
+  -webkit-appearance: none;
+  color: white;
+  background: none;
+  text-align: center;
+  font-size: 1em;
+  font-weight: bold;
+  border: none;
+  outline: none;
+}
+
+.person input::-webkit-outer-spin-button,
+.person input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.person button {
+  display: block;
+  -webkit-appearance: none;
+  border: none;
+  background: none;
+
+  position: absolute;
+  height: 42px;
+  width: 42px;
+  top: 5px;
+  left: 29px;
+
+  color: white;
+  font-size: 30px;
+  cursor: pointer;
+
+  visibility: hidden;
+}
+
+.person:hover button {
+  visibility: visible;
+}
+
+/* Round button */
+.round-button {
+  -webkit-appearance: none;
+  cursor: pointer;
+  color: white;
+  background: black;
+  border-radius: 50%;
+  border: none;
+  width: 50px;
+  height: 50px;
+}
+
+.people__item--button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

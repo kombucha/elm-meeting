@@ -27,7 +27,7 @@ type alias Model =
 
 init : (Model, Cmd Msg)
 init =
-  (Model [] False 0, Cmd.none)
+  (Model [500, 500] False 0, Cmd.none)
 
 
 -- UPDATE
@@ -47,14 +47,15 @@ update action model =
     AddPerson ->
       let
         newPerson = 500
-        newPeople = model.people ++ [ newPerson ]
+        newPeople = newPerson :: model.people
       in
         ({model | people = newPeople}, Cmd.none)
 
     SetPersonCost index rateAsString ->
       let
-        newRate = Result.withDefault 0 (String.toInt rateAsString)
-        newPeopleList = updateInList index newRate model.people
+        parsedRate = Result.withDefault 0 (String.toInt rateAsString)
+        clampedRate = Basics.min parsedRate 9900
+        newPeopleList = updateInList index clampedRate model.people
       in
         ({model | people = newPeopleList}, Cmd.none)
 
@@ -109,7 +110,7 @@ subscriptions model =
 -- VIEWs
 view : Model -> Html Msg
 view model =
-    div []
+    div [(class "app-container")]
       [ viewMeetingCost model.meetingCost
       , viewCommands model.meetingStarted
       , viewPeople model.people
@@ -118,8 +119,7 @@ view model =
 viewCommands : Bool -> Html Msg
 viewCommands meetingStarted =
   div []
-    [ button [onClick AddPerson] [text "Add person"]
-    , button [(disabled meetingStarted), (onClick StartMeeting)] [text "Start"]
+    [ button [(disabled meetingStarted), (onClick StartMeeting)] [text "Start"]
     , button [(disabled (not meetingStarted)), (onClick EndMeeting)] [text "Stop"]
     , button [(onClick Reset)] [text "Reset"]
     ]
@@ -129,17 +129,36 @@ viewMeetingCost meetingCost =
   let
     roundedCostString = meetingCost |> roundTo 2 |> toString
   in
-    div [] [text roundedCostString]
+    div [] [text (roundedCostString ++ "€")]
 
 viewPeople : List Person -> Html Msg
 viewPeople people =
-  ul [] (List.indexedMap (\index person -> li [] [viewPerson index person]) people)
+  let
+    peopleList =
+      (List.indexedMap (\index person -> li [(class "people__item")] [viewPerson index person]) people)
+    addPersonButton =
+      li [class "people__item people__item--button"] [button [onClick AddPerson, class "round-button"] [text "+"]]
+    interactivePeopleList =
+      addPersonButton :: peopleList
+    peopleLabel =
+      (people |> List.length |> toString) ++ " people"
+  in
+    div []
+      [ div [] [text peopleLabel]
+      , ul [(class "people")] interactivePeopleList
+      ]
 
 viewPerson : PersonId -> Person -> Html Msg
 viewPerson personId personRate =
-  p []
-    [ text "I cost"
-    , input [(type' "number"), (value (toString personRate)), (onInput (SetPersonCost personId))] []
-    , text "Per hour"
+  label [(class "person")]
+    [ img [(src "resources/person.svg")] []
+    , input
+      [(type' "number")
+      , (value (toString personRate))
+      , (Html.Attributes.min "100")
+      , (Html.Attributes.max "10000")
+      , (step "100")
+      , (onInput (SetPersonCost personId))
+      ] []
     , button [onClick (RemovePerson personId)] [text "x"]
     ]
